@@ -171,20 +171,24 @@ export default function CurvedScreen({ videoSrc, curve = 0, className = '' }) {
     const ro = new ResizeObserver(resize)
     ro.observe(host)
 
-    let onScreen = true
-    const io = new IntersectionObserver(([e]) => {
-      onScreen = e.isIntersecting
-      if (onScreen) video.play().catch(() => {})
-      else video.pause()
-    })
-    io.observe(host)
+    // Keep the hero source decoding while the sticky panel changes size. The
+    // section itself remains visible during the scroll, but its WebGL host can
+    // briefly report as non-intersecting while the layout is being repainted.
+    // Pausing there makes the texture flash black on the next frame.
+    const resume = () => {
+      if (document.visibilityState === 'visible') video.play().catch(() => {})
+    }
+    video.addEventListener('canplay', resume)
+    document.addEventListener('visibilitychange', resume)
 
     let raf = 0
     const frame = () => {
       raf = requestAnimationFrame(frame)
-      if (!onScreen) return
       const c = curveRef.current
       uniforms.uCurve.value = typeof c === 'number' ? c : (c?.get?.() ?? 0)
+      if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+        texture.needsUpdate = true
+      }
       renderer.render(scene, camera)
     }
     frame()
@@ -192,7 +196,8 @@ export default function CurvedScreen({ videoSrc, curve = 0, className = '' }) {
     return () => {
       cancelAnimationFrame(raf)
       ro.disconnect()
-      io.disconnect()
+      video.removeEventListener('canplay', resume)
+      document.removeEventListener('visibilitychange', resume)
       video.pause()
       video.removeAttribute('src')
       video.load()
