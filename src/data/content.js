@@ -406,7 +406,7 @@ export const FOUNDERS = [
 ]
 
 export const CONTACT = {
-  photo: 'https://picsum.photos/seed/rator-founder/300/300',
+  photo: '/goutham-ramesh.png',
   name: 'Goutham Ramesh',
   title: 'I speak strategy, design & storytelling | Building Rator Studios',
   prompt: 'From concept to launch, we are here to build it with you.',
