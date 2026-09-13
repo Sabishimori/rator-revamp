@@ -1,0 +1,45 @@
+# dependencies
+node_modules/
+
+# build output
+dist/
+dist-ssr/
+*.local
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+logs/
+*.log
+
+# editor / OS
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db
+*.suo
+*.njsproj
+*.sln
+*.sw?
+
+# env
+.env
+.env.*
+!.env.example
+
+# local media dropped in for the hero / project reels
+public/work/*.mp4
+public/reel.mp4
+
+# editor / tooling config
+.claude/
+
+# Pitch and concept documents — internal, not part of the app.
+# They contain the candid brand critique and commercial questions, which are
+# for presenting deliberately, not for leaving in a repo the client browses.
+# The files stay on disk; they are just not tracked.
+rator-caliber-01.html
+rator-site.html

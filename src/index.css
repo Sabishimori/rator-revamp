@@ -1,0 +1,194 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* No `scroll-behavior: smooth` here — Lenis drives the easing itself and
+     the native property fights it, producing a double animation on anchors.
+     Also do NOT add overflow-x: it forces overflow-y to `auto`, which makes
+     <html> a scroll container and breaks scroll offset measurement.
+     Full-bleed elements size off clientWidth instead, so nothing overflows. */
+  html {
+    scroll-behavior: auto;
+  }
+
+  /* Required by Lenis. */
+  html.lenis,
+  html.lenis body {
+    height: auto;
+  }
+  .lenis:not(.lenis-autoToggle).lenis-stopped {
+    overflow: clip;
+  }
+  .lenis [data-lenis-prevent] {
+    overscroll-behavior: contain;
+  }
+  .lenis.lenis-smooth iframe {
+    pointer-events: none;
+  }
+
+  body {
+    @apply bg-black font-sans text-white antialiased;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+    margin: 0;
+  }
+
+  ::selection {
+    @apply bg-rator-accent text-white;
+  }
+
+  :focus-visible {
+    outline: 2px solid theme('colors.rator.accent');
+    outline-offset: 3px;
+  }
+}
+
+@layer components {
+  /* Frosted nav pills — content behind stays visibly blurred, not hidden. */
+  .glass-dark {
+    background: rgba(10, 10, 11, 0.38);
+    backdrop-filter: blur(14px) saturate(140%);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+  }
+
+  .glass-light {
+    background: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(14px) saturate(140%);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+  }
+
+  /* Full viewport width with a fixed gutter — no centred max-width column.
+     The reference does the same: its container spans the full width minus a
+     30px margin on each side, so the page keeps filling a wide display. */
+  .shell {
+    @apply mx-auto w-full px-5 sm:px-6 lg:px-[30px];
+  }
+
+  /* Horizontal card rows: scroll, but keep the scrollbar out of the design. */
+  .rail {
+    @apply flex gap-4 overflow-x-auto pb-2;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+  .rail::-webkit-scrollbar {
+    display: none;
+  }
+  .rail > * {
+    scroll-snap-align: start;
+    flex: 0 0 auto;
+  }
+}
+
+@layer utilities {
+  /* ── marquee: the page's one always-on motion ─────────────────── */
+  .marquee {
+    overflow: hidden;
+  }
+  .marquee-track {
+    display: flex;
+    width: max-content;
+    animation: marqueeSlide var(--marquee-duration, 46s) linear infinite;
+  }
+  .marquee-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 28px;
+    padding-right: 28px;
+    white-space: nowrap;
+    font-size: clamp(15px, 1.5vw, 21px);
+    letter-spacing: -0.026em;
+    color: rgba(255, 255, 255, 0.45);
+  }
+  .marquee-dot {
+    font-style: normal;
+    color: #5B2BFF;
+    opacity: 0.75;
+  }
+  @keyframes marqueeSlide {
+    from { transform: translate3d(0, 0, 0); }
+    to   { transform: translate3d(-50%, 0, 0); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .marquee-track { animation: none; }
+  }
+
+  /* Film grain over the entire page. `overlay` blending means one layer reads
+     correctly on both the dark and the light sections. */
+  .grain-layer {
+    position: fixed;
+    inset: -120px;
+    z-index: 70;
+    pointer-events: none;
+    opacity: 0.09;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23g)'/%3E%3C/svg%3E");
+    animation: grainJitter 0.8s steps(4) infinite;
+  }
+
+  @keyframes grainJitter {
+    0% { transform: translate(0, 0); }
+    25% { transform: translate(-3%, 2%); }
+    50% { transform: translate(2%, -3%); }
+    75% { transform: translate(-2%, -2%); }
+    100% { transform: translate(0, 0); }
+  }
+
+  /* Takes the hard edge off the corners without dimming the content. */
+  .vignette-layer {
+    position: fixed;
+    inset: 0;
+    z-index: 69;
+    pointer-events: none;
+    /* Kept light on purpose: at 0.3 this visibly washed out imagery near the
+       edges and made solid tiles read as semi-transparent. */
+    background: radial-gradient(130% 120% at 50% 45%, transparent 68%, rgba(0, 0, 0, 0.16) 100%);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .grain-layer { animation: none; }
+  }
+
+  /* Stand-in for photography until real stills are dropped in. */
+  .plate-noise {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* Graded stand-in for the hero reel until a real video is dropped in.
+     Slow drifting light, no dot treatment. */
+  .reel-fallback {
+    background:
+      radial-gradient(70% 90% at 32% 28%, rgba(120, 150, 190, 0.5), transparent 62%),
+      radial-gradient(60% 80% at 74% 70%, rgba(200, 140, 90, 0.34), transparent 60%),
+      linear-gradient(155deg, #1a2230 0%, #0a0d12 55%, #050607 100%);
+    background-size: 160% 160%, 150% 150%, 100% 100%;
+    animation: reelDrift 28s ease-in-out infinite alternate;
+  }
+
+  @keyframes reelDrift {
+    from {
+      background-position: 0% 0%, 100% 100%, 0 0;
+    }
+    to {
+      background-position: 30% 22%, 66% 60%, 0 0;
+    }
+  }
+
+  .dot-matrix {
+    background-image: radial-gradient(currentColor 1.4px, transparent 1.5px);
+    background-size: 9px 9px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
