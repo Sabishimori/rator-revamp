@@ -84,7 +84,7 @@ export const PROJECTS = [
     tags: ['Films', 'Strategy'],
     accent: '#2B5CE6',
     runtime: '04:12',
-    year: '2025',
+    year: '2026',
     description:
       'Explainer and internal communication films for a global energy business — turning systems a boardroom and a factory floor both depend on into four minutes either can follow.',
     featured: true,
@@ -98,7 +98,7 @@ export const PROJECTS = [
     tags: ['Branding', 'Strategy'],
     accent: '#E8541F',
     runtime: '01:47',
-    year: '2025',
+    year: '2026',
     description:
       'Positioning, messaging framework and an identity system built to hold together as the menu, the market and the team all grew at once.',
   },
@@ -111,7 +111,7 @@ export const PROJECTS = [
     tags: ['Branding', 'Social'],
     accent: '#0FA3A3',
     runtime: '00:58',
-    year: '2024',
+    year: '2026',
     description:
       'Mascot design and brand strategy giving a young brand a character that carries its own weight across social, without a media budget behind it.',
   },
@@ -124,7 +124,7 @@ export const PROJECTS = [
     tags: ['Campaign', 'Design'],
     accent: '#7C3AED',
     runtime: '02:05',
-    year: '2024',
+    year: '2026',
     description:
       'Launch campaign and communication design — one idea stretched across film, print and retail so the launch read as a single thing everywhere it landed.',
   },
@@ -137,7 +137,7 @@ export const PROJECTS = [
     tags: ['Campaign', 'Strategy'],
     accent: '#0EA5E9',
     runtime: '01:20',
-    year: '2024',
+    year: '2026',
     description:
       'Campaign design and content strategy built around one running narrative instead of a content calendar. Fewer posts, a story that accumulates.',
   },
@@ -150,7 +150,7 @@ export const PROJECTS = [
     tags: ['Branding'],
     accent: '#CA8A04',
     runtime: '01:36',
-    year: '2023',
+    year: '2026',
     description:
       'A visual identity deliberately quiet enough to let the product talk, and structured enough to survive being handed to someone else.',
   },
@@ -263,16 +263,23 @@ export const REACH_WORDS = [
   { w: 'Brand architecture' },
 ]
 
+/**
+ * Rator started in 2026, so these stay small on purpose. Two of them are
+ * real: six clients are named on the site, and the three disciplines are the
+ * studio's own. A first-year studio claiming 300 projects or 40 awards reads
+ * false to anyone who checks — and the client is the one person guaranteed
+ * to check.
+ */
 export const STATS = [
-  { label: 'Since', value: 2020, suffix: '', raw: true },
-  { label: 'Projects', value: 300, suffix: '+' },
-  { label: 'Countries', value: 9, suffix: '' },
-  { label: 'Recognitions', value: 40, suffix: '+' },
+  { label: 'Founded', value: 2026, suffix: '', raw: true },
+  { label: 'Clients', value: 6, suffix: '' },
+  { label: 'Disciplines', value: 3, suffix: '' },
+  { label: 'Projects', value: 12, suffix: '+' },
 ]
 
 export const ABOUT = {
-  headline: ['Nothing here', 'happened', 'overnight.'],
-  body: 'Rator Studios is an independent studio in Bengaluru working across sectors and borders. Each number is a step forward, shaped by real briefs, real constraints, and a standing refusal to start a film before the strategy is settled.',
+  headline: ['A new studio,', 'with a settled', 'way of working.'],
+  body: 'Rator Studios started in 2026, in Bengaluru. Small on purpose, and deliberate about the order of things — positioning before the camera, every time. The client list is short because it is real.',
   cta: 'Know us better',
 }
 
