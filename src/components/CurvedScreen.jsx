@@ -46,8 +46,12 @@ const FRAG = `
 
     vec2 uv = p * 0.5 + 0.5;
 
-    // past the edge of the tube — let the page show through
-    if (uv.x < 0.0 || uv.x > 1.0 || uv.y < 0.0 || uv.y > 1.0) discard;
+    // past the edge of the tube — let the page show through, feathered so the
+    // curved silhouette stays smooth without multisampling
+    vec2 outside = max(-uv, uv - 1.0);
+    float over = max(outside.x, outside.y);
+    float alpha = 1.0 - smoothstep(0.0, 0.0035, over);
+    if (alpha <= 0.001) discard;
 
     vec2 cuv = (uv - 0.5) * uCover + 0.5;
     vec3 col = uHasTex > 0.5 ? texture2D(uTex, cuv).rgb : vec3(0.04, 0.04, 0.05);
@@ -59,7 +63,7 @@ const FRAG = `
     col *= mix(1.0, edge, amt * 0.85);
     col += vec3(0.05) * amt * smoothstep(0.75, 0.0, vUv.y);
 
-    gl_FragColor = vec4(col, 1.0);
+    gl_FragColor = vec4(col, alpha);
   }
 `
 
@@ -75,7 +79,14 @@ export default function CurvedScreen({ videoSrc, curve = 0, className = '' }) {
 
     let renderer
     try {
-      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
+      renderer = new THREE.WebGLRenderer({
+        // antialias off on purpose: it allocates multisample buffers, which makes
+        // every resize during the scroll dramatically more expensive. There is
+        // no geometry to alias here — the tube edge is feathered in the shader.
+        antialias: false,
+        alpha: true,
+        powerPreference: 'high-performance',
+      })
     } catch {
       setFailed(true)
       return
@@ -156,16 +167,29 @@ export default function CurvedScreen({ videoSrc, curve = 0, className = '' }) {
       else uniforms.uCover.value.set(planeAspect / texAspect, 1)
     }
 
+    /**
+     * The hero panel animates its width and height every frame while you
+     * scroll, so this fires continuously — and resizing a WebGL drawing buffer
+     * CLEARS it. Left alone the browser composites that empty buffer before
+     * the next animation frame paints, which shows as the picture flashing
+     * black for the whole scroll and only returning once you stop.
+     *
+     * Two things fix it: snap to coarse steps so the buffer is reallocated a
+     * fraction as often, and repaint synchronously so a freshly cleared buffer
+     * is never the thing that gets composited.
+     */
+    const STEP = 32
     let lastW = 0
     let lastH = 0
     const resize = () => {
-      const w = Math.round(host.clientWidth / 8) * 8
-      const h = Math.round(host.clientHeight / 8) * 8
+      const w = Math.round(host.clientWidth / STEP) * STEP
+      const h = Math.round(host.clientHeight / STEP) * STEP
       if (!w || !h || (w === lastW && h === lastH)) return
       lastW = w
       lastH = h
       renderer.setSize(w, h, false)
       fit()
+      renderer.render(scene, camera)
     }
     resize()
     const ro = new ResizeObserver(resize)
