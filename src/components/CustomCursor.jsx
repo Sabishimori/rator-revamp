@@ -36,6 +36,22 @@ export default function CustomCursor() {
     return () => window.removeEventListener('mousemove', onMove)
   }, [x, y])
 
+  /**
+   * Hide the OS cursor site-wide, so the brand dot is the only pointer on
+   * screen rather than a second one trailing the real arrow.
+   *
+   * The rule is keyed off a class this component adds on mount and removes on
+   * unmount, rather than being written flat into the stylesheet. If the custom
+   * cursor ever fails to render, the class is never applied and the viewer
+   * keeps a normal working cursor instead of none at all.
+   */
+  useEffect(() => {
+    if (window.matchMedia('(pointer: coarse)').matches) return
+    const root = document.documentElement
+    root.classList.add('cursor-hidden')
+    return () => root.classList.remove('cursor-hidden')
+  }, [])
+
   if (typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches) {
     return null
   }
@@ -73,7 +89,7 @@ export default function CustomCursor() {
               exit={{ scale: 0, opacity: 0 }}
               transition={{ type: 'spring', stiffness: 520, damping: 30 }}
               style={{ x: '-50%', y: '-50%' }}
-              className="absolute left-0 top-0 h-3 w-3 rounded-full bg-white mix-blend-difference"
+              className="absolute left-0 top-0 h-3.5 w-3.5 rounded-full bg-rator-accent ring-2 ring-white/45"
             />
           )}
         </AnimatePresence>

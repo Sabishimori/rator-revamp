@@ -38,6 +38,14 @@
     @apply bg-rator-accent text-white;
   }
 
+  /* Only while the custom cursor is actually mounted (see CustomCursor). */
+  @media (pointer: fine) {
+    html.cursor-hidden,
+    html.cursor-hidden * {
+      cursor: none !important;
+    }
+  }
+
   :focus-visible {
     outline: 2px solid theme('colors.rator.accent');
     outline-offset: 3px;
