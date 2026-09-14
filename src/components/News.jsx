@@ -29,7 +29,7 @@ export default function News() {
               >
                 <ParallaxImage
                   src={n.image}
-                  strength={34}
+                  speed={1.12}
                   className="aspect-[4/3] w-full ring-1 ring-white/10 transition-transform duration-[600ms] ease-out group-hover:scale-[1.02]"
                 />
                 <h3 className="text-[18px] font-medium leading-snug tracking-tight">{n.title}</h3>

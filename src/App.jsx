@@ -41,29 +41,39 @@ import Footer from './components/Footer.jsx'
 export default function App() {
   return (
     <CursorProvider>
+      {/*
+        Everything position:fixed stays OUTSIDE #smooth-wrapper. ScrollSmoother
+        translates the content, and a transformed ancestor becomes the
+        containing block for fixed children — inside the wrapper the header,
+        cursor and grain would scroll away with the page.
+      */}
       <SmoothScroll />
       <GrainOverlay />
       <CustomCursor />
       <Header />
 
-      <main>
-        <Hero />
-        <WorkGrid />
-        <div className="bg-black">
-          <Marquee items={CLIENTS} duration={52} />
-        </div>
-        <Capabilities />
-        <Reach />
-        <Stats />
-        <Outcomes />
-        <Founders />
-        <Testimonials />
-        <ClientGrid />
-        <News />
-        <ContactCTA />
-      </main>
+      <div id="smooth-wrapper">
+        <div id="smooth-content">
+          <main>
+            <Hero />
+            <WorkGrid />
+            <div className="bg-black">
+              <Marquee items={CLIENTS} duration={52} />
+            </div>
+            <Capabilities />
+            <Reach />
+            <Stats />
+            <Outcomes />
+            <Founders />
+            <Testimonials />
+            <ClientGrid />
+            <News />
+            <ContactCTA />
+          </main>
 
-      <Footer />
+          <Footer />
+        </div>
+      </div>
     </CursorProvider>
   )
 }

@@ -1,5 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import { motion, useMotionValue, useTransform } from 'framer-motion'
+import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+
+gsap.registerPlugin(ScrollTrigger)
 import CurvedScreen from './CurvedScreen.jsx'
 import { HERO } from '../data/content.js'
 
@@ -48,39 +52,39 @@ export default function Hero() {
     }
   }, [])
 
-  /** Scroll progress: 0 at the top, 1 when the sticky child releases. */
+  /** Scroll progress through the pinned hero: 0 at the top, 1 when it releases. */
   const scrollYProgress = useMotionValue(0)
 
   useEffect(() => {
     const el = ref.current
     if (!el) return
 
-    let raf = 0
-    let onScreen = true
-    const io = new IntersectionObserver(([e]) => (onScreen = e.isIntersecting), { threshold: 0 })
-    io.observe(el)
+    /**
+     * ScrollTrigger does the pinning, not CSS `position: sticky`.
+     *
+     * ScrollSmoother translates the whole content block, and sticky resolves
+     * against the scrollport rather than that transform — so a sticky hero
+     * drifts instead of holding. ScrollTrigger's pin is built to work with the
+     * smoother, and it also creates the spacer, which is why the section is
+     * one viewport tall here rather than 300vh of manual runway.
+     *
+     * It also replaces the per-frame rAF loop this used to run: `scrub` hands
+     * back a progress value, which feeds the same Framer motion values the
+     * panel and the shader were already reading.
+     */
+    const st = ScrollTrigger.create({
+      trigger: el,
+      start: 'top top',
+      end: '+=300%',
+      pin: true,
+      pinSpacing: true,
+      // a touch of catch-up, so the zoom trails the wheel rather than snapping
+      scrub: 0.6,
+      invalidateOnRefresh: true,
+      onUpdate: (self) => scrollYProgress.set(self.progress),
+    })
 
-    const update = () => {
-      const travel = el.offsetHeight - window.innerHeight
-      const scrolled = -el.getBoundingClientRect().top
-      const next = travel > 0 ? Math.min(1, Math.max(0, scrolled / travel)) : 0
-      if (Math.abs(next - scrollYProgress.get()) > 0.0005) scrollYProgress.set(next)
-    }
-
-    const frame = () => {
-      raf = requestAnimationFrame(frame)
-      if (onScreen) update()
-    }
-    frame()
-    window.addEventListener('scroll', update, { passive: true })
-    window.addEventListener('resize', update)
-
-    return () => {
-      cancelAnimationFrame(raf)
-      io.disconnect()
-      window.removeEventListener('scroll', update)
-      window.removeEventListener('resize', update)
-    }
+    return () => st.kill()
   }, [scrollYProgress])
 
   // a wide, rectangular set — not the squarer 16:10 it used to be
@@ -105,8 +109,8 @@ export default function Hero() {
   const kickerOpacity = useTransform(scrollYProgress, [0, 0.3], [1, 0])
 
   return (
-    <section id="hero" ref={ref} data-nav="dark" className="relative h-[300vh] bg-black">
-      <div className="sticky top-0 h-screen overflow-hidden bg-black">
+    <section id="hero" ref={ref} data-nav="dark" className="relative h-screen overflow-hidden bg-black">
+      <div className="relative h-full w-full">
         <motion.div
           // x/y here, not Tailwind's -translate-*: Framer owns `transform` on
           // a motion element and would overwrite the utility classes.

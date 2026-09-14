@@ -3,28 +3,13 @@
 @tailwind utilities;
 
 @layer base {
-  /* No `scroll-behavior: smooth` here — Lenis drives the easing itself and
-     the native property fights it, producing a double animation on anchors.
+  /* No `scroll-behavior: smooth` here — ScrollSmoother drives the easing
+     itself and the native property fights it, double-animating anchors.
      Also do NOT add overflow-x: it forces overflow-y to `auto`, which makes
      <html> a scroll container and breaks scroll offset measurement.
      Full-bleed elements size off clientWidth instead, so nothing overflows. */
   html {
     scroll-behavior: auto;
-  }
-
-  /* Required by Lenis. */
-  html.lenis,
-  html.lenis body {
-    height: auto;
-  }
-  .lenis:not(.lenis-autoToggle).lenis-stopped {
-    overflow: clip;
-  }
-  .lenis [data-lenis-prevent] {
-    overscroll-behavior: contain;
-  }
-  .lenis.lenis-smooth iframe {
-    pointer-events: none;
   }
 
   body {
